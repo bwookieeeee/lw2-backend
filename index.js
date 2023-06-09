@@ -3,7 +3,7 @@ const express = require("express");
 const uuid = require("uuid");
 const Client = require("pg").Client;
 const client = new Client( {
-  connectionString: process.env.DB_CONNECTIONSTRING
+  connectionString: process.env.DATABASE_URL
 })
 
 const app = express()
