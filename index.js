@@ -2,8 +2,8 @@ require('dotenv').config();
 const fs = require("fs");
 const express = require("express");
 const uuid = require("uuid");
-const Client = require("pg").Client;
-const client = new Client({
+const Pool = require("pg").Pool;
+const client = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
@@ -28,9 +28,9 @@ app.get('/user', async (req, res) => {
   // TODO: authorization
   try {
 
-    client.connect();
+//     client.connect();
     const ret = await client.query("SELECT * FROM users WHERE email=$1::text LIMIT 1", [req.body.target]);
-    client.end();
+//     client.end();
 
     const t = ret.rows[0];
     res.status(200).json({
