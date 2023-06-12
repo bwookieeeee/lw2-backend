@@ -7,7 +7,7 @@ const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
-    ca: [fs.readFileSync(process.env.CA_CERT)]
+    ca: [process.env.CA_CERT]
 }
 })
 
