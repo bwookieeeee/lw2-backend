@@ -2,10 +2,11 @@
   "name": "lw2-backend",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node ./build/index.js"
+    "start": "tsc && node ./build/index.js",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,9 @@
     "@types/node": "^20.3.1",
     "@types/pg": "^8.10.2",
     "@types/uuid": "^9.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.59.11",
+    "@typescript-eslint/parser": "^5.59.11",
+    "eslint": "^8.42.0",
     "typescript": "^5.1.3"
   }
 }
