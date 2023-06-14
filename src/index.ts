@@ -53,7 +53,7 @@ app.post("/user", async (req, res) => {
   const lastName: string | null = req.body.lastName || null;
 
   try {
-    const q: QueryResult = await client.query("INSERT INTO users (email, pw_hash, permissions, firstName, lastName) WHERE id=$1", [
+    const q: QueryResult = await client.query("INSERT INTO users (email, pw_hash, permissions, firstName, lastName) VALUES ($2,$3,$4,$5,$6) WHERE id=$1", [
       id, email, pwHash, permissions, firstName, lastName
     ]);
     res.status(201).json({
