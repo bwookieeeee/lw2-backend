@@ -1,11 +1,12 @@
 import "dotenv";
 import express, { Application } from "express";
 import { Pool, QueryResult } from "pg";
+import { v4 } from "uuid";
 
 // Set defaults
-const port: number = process.env.EX_PORT ? process.env.EX_PORT as unknown as number : 3000;
-const databaseUrl: string = process.env.DATABASE_URL ? process.env.DATABASE_URL as string : "postgresql://localhost";
-const version: string = process.env.LW2_VERSION ? process.env.LW2_VERSION as string : "0.0.0";
+const port: number = process.env.EX_PORT as unknown as number || 3000;
+const databaseUrl: string = process.env.DATABASE_URL as string || "postgresql://localhost";
+const version: string = process.env.LW2_VERSION as string || "0.0.0";
 
 
 const app: Application = express();
@@ -36,6 +37,33 @@ app.get("/user", async (req, res) => {
       firstName: t.first_name,
       lastName: t.last_name,
     });
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(500);
+  }
+})
+
+app.post("/user", async (req, res) => {
+  console.log(`POST /user ${req.body.email}`);
+  const id:string = v4();
+  const email: string = req.body.email;
+  const pwHash: string = req.body.pwHash;
+  const permissions: number = req.body.permissions || 0;
+  const firstName: string = req.body.firstName;
+  const lastName: string | null = req.body.lastName || null;
+
+  try {
+    const q: QueryResult = await client.query("INSERT INTO users (email, pw_hash, permissions, firstName, lastName) WHERE id=$1", [
+      id, email, pwHash, permissions, firstName, lastName
+    ]);
+    res.status(201).json({
+      id: id,
+      email: email,
+      pwHash: pwHash,
+      permissions: permissions,
+      firstName: firstName,
+      lastName: lastName
+    })
   } catch (e) {
     console.error(e);
     res.sendStatus(500);
