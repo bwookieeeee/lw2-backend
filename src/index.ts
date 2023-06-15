@@ -26,8 +26,8 @@ app.get('/', (req, res) => {
 });
 
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authentication'];
-  const token = authHeader.split(' ')[1];
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
   jwt.verify(token, process.env.JWT_TOKEN as string, (err, user) => {
     if (err) return res.sendStatus(403);
