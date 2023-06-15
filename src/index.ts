@@ -30,6 +30,7 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
 
   jwt.verify(token, process.env.JWT_TOKEN as string, (err, user) => {
+    console.error(err);
     if (err) return res.sendStatus(403);
     req.user=user;
     next();
