@@ -2,6 +2,7 @@ import "dotenv";
 import express, { Application } from "express";
 import { Pool, QueryResult } from "pg";
 import { v4 } from "uuid";
+import jwt from "jsonwebtoken";
 
 // Set defaults
 const port: number = process.env.EX_PORT as unknown as number || 3000;
@@ -22,6 +23,48 @@ app.get('/', (req, res) => {
     version: version
   });
 });
+
+app.get("/authenticate", async (req, res, next) => {
+  let { email, pwHash } = req.body;
+  let usr;
+  try {
+    const q = await client.query("SELECT * FROM users WHERE email=$1::text LIMIT 1", [email]);
+    if (q.rows.length > 0 && q.rows[0].pw_hash === pwHash) {
+      usr = q.rows[0];
+    } else {
+      const error = Error("Username or password is incorrect");
+      return next(error);
+    }
+  } catch (e) {
+    console.error(e);
+    return next(e);
+  }
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        id: usr.id,
+        email: usr.email,
+        permissions: usr.permissions
+      },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "1h"
+      }
+    )
+  } catch (e) {
+    console.error(e);
+    return next(e);
+  }
+
+  res.status(200).json(
+    {
+      id: usr.id,
+      email: usr.email,
+      token: token
+    }
+  )
+})
 
 app.get("/user", async (req, res) => {
   console.log(`GET /user ${req.body.target}`);
@@ -45,7 +88,7 @@ app.get("/user", async (req, res) => {
 
 app.post("/user", async (req, res) => {
   console.log(`POST /user ${req.body.email}`);
-  const id:string = v4();
+  const id: string = v4();
   const email: string = req.body.email;
   const pwHash: string = req.body.pwHash;
   const permissions: number = req.body.permissions || 0;
