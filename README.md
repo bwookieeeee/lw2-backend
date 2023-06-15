@@ -1,6 +1,21 @@
 # lw2-backend
 
-db structure:
+## Environment Variables
+
+| Name           | Default Value            | Description                             |
+| -------------- | ------------------------ | --------------------------------------- |
+| `DATABASE_URL` | `postgresql://localhost` | PostgreSQL connection URL               |
+| `DB_HOST`      | `::1`                    | PostgreSQL server host (IP or hostname) |
+| `DB_PORT`      | `5432`                   | PostgreSQL server port                  |
+| `DB_USER`      | `postgres`               | PostgreSQL connecting user              |
+| `DB_PASS`      |                          | PostgreSQL connection password          |
+| `DB_DATA`      | `postgres`               | PostgreSQL database name                |
+| `JWT_SECRET`   |                          | JSONWebToken secret                     |
+| `EX_PORT`      | `3000`                   | Express listening port                  |
+| `CONSOLE_URL`  | `http://localhost`       | Address posted in console for API       |
+| `LW2_VERSION`  | `0.0.0`                  | Project version                         |
+
+## Data Structures
 
 ```
 users
