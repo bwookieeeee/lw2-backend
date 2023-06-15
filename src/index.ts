@@ -4,6 +4,7 @@ import { Pool, QueryResult } from "pg";
 import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
 
+
 // Set defaults
 const port: number = process.env.EX_PORT as unknown as number || 3000;
 const databaseUrl: string = process.env.DATABASE_URL as string || "postgresql://localhost";
@@ -24,8 +25,19 @@ app.get('/', (req, res) => {
   });
 });
 
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authentication'];
+  const token = authHeader.split(' ')[1];
+
+  jwt.verify(token, process.env.JWT_TOKEN as string, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user=user;
+    next();
+  })
+}
+
 app.get("/authenticate", async (req, res, next) => {
-  let { email, pwHash } = req.body;
+  const { email, pwHash } = req.body;
   let usr;
   try {
     const q = await client.query("SELECT * FROM users WHERE email=$1::text LIMIT 1", [email]);
@@ -66,7 +78,7 @@ app.get("/authenticate", async (req, res, next) => {
   )
 })
 
-app.get("/user", async (req, res) => {
+app.get("/user", authenticateToken, async (req, res) => {
   console.log(`GET /user ${req.body.target}`);
   try {
     const target: string = req.body.target;
