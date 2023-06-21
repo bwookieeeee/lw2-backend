@@ -15,36 +15,44 @@
 | `CONSOLE_URL`  | `http://localhost`       | Address posted in console for API       |
 | `LW2_VERSION`  | `0.0.0`                  | Project version                         |
 
-## Data Structures
+## Table Schemas
 
-```
-users
-	id              uuid*
-	username        text
-	pw_hash         text  (md5)
-	email           text
-	permissions     int   (0 - read only, 1 - non-destruct write, 2 - destruct write, 3 - admin)
+### Users
 
-cases
-	id              uuid*
-	name            text                (doe, john)
-	number          text            		(123456 / AB12345)
-	iis             text  		nullable
-	notes           text arr	nullable
-	vols            uuid arr	nullable
-	flags           text arr 	nullable	(rf, od, re, 30, ci)
-	is_restricted   bool	  	nullable
+| Name      | Type   | Flags                             | Description                                                  |
+| --------- | ------ | --------------------------------- | ------------------------------------------------------------ |
+| `id`      | `uuid` | `primary key` `not null` `unique` | v4 uuid assigned to the user                                 |
+| `pw_hash` | `text` | `not null`                        | MD5 hash of password. Password is hashed client-side         |
+| `email`   | `text` | `not null` `unique`               | Email address of user, will be used for signing in           |
+| `flags`   | `int`  |                                   | Decimal representation of up to 32 configurable binary flags |
 
-vols
-	id              uuid*
-	name            text 			         	(cl01 / sf01 etc)
-	notes           text arr  nullable
-	call            text      nullable
-	in_box          bool
-	box_id          uuid      nullable
+### Cases
 
-boxes
-	id		          uuid*
-	call		        text
-	contains        uuid arr	nullable
-```
+| Name     | Type     | Flags                             | Description                                                  |
+| -------- | -------- | --------------------------------- | ------------------------------------------------------------ |
+| `id`     | `uuid`   | `primary key` `not null` `unique` | v4 UUID assigned to a case                                   |
+| `name`   | `text`   | `not null`                        | `last, first` or `provider` of case                          |
+| `number` | `text`   | `not null`                        | `123456` or `AB12345` of case                                |
+| `iis`    | `text`   |                                   | `AB12345` of case when `number` is `123456`                  |
+| `notes`  | `text[]` |                                   | Notes applying to all vols in case                           |
+| `flags`  | `int`    |                                   | Decimal representation of up to 32 configurable binary flags |
+
+### Vols
+
+| Name     | Type     | Flags                             | Description                                                       |
+| -------- | -------- | --------------------------------- | ----------------------------------------------------------------- |
+| `id`     | `uuid`   | `primary key` `not null` `unique` | v4 UUID assigned to a volume                                      |
+| `name`   | `text`   | `not null`                        | Volume name (CL01, SF01, PR01, etc)                               |
+| `notes`  | `text[]` |                                   | Notes that apply to this volume such as prepped and scanned marks |
+| `call`   | `text`   |                                   | Location of volume                                                |
+| `box_id` | `uuid`   |                                   | ID of box if applicable                                           |
+| `flags`  | `int`    |                                   | Decimal representation of up to 32 customizable binary flags      |
+
+### Boxes
+
+| Name       | Type     | Flags                             | Description               |
+| ---------- | -------- | --------------------------------- | ------------------------- |
+| `id`       | `uuid`   | `primary key` `not null` `unique` | v4 UUID assigned to box   |
+| `call`     | `text`   | `not null`                        | Location of box           |
+| `contains` | `uuid[]` |                                   | IDs of volumes inside box |
+
