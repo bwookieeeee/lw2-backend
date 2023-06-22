@@ -1,5 +1,5 @@
 import "dotenv";
-import express, { Application } from "express";
+import express, { Application, application } from "express";
 import { Pool, QueryResult } from "pg";
 import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
@@ -17,6 +17,15 @@ const client = new Pool({
 })
 
 app.use(express.json());
+
+const updateTableByID = (table: string, id:string, cols: object) => {
+  let str = `UPDATE ${table} SET `;
+  Object.keys(cols).forEach( (key, i) => {
+    str += `${key} = '${i+1}'`
+  })
+  str += `where id='${id}'`
+  return str;
+}
 
 app.get('/', (req, res) => {
   console.log("GET /");
@@ -124,6 +133,24 @@ app.post("/user", async (req, res) => {
     console.error(e);
     res.sendStatus(500);
   }
+})
+
+app.patch("/user", authenticateToken, async (req, res) => {
+  console.log("PATCH /user", req.body.id)
+
+  try {
+
+    const colVals = Object.keys(req.body).map( key => {
+      if (key != 'id') return req.body[key];
+    })
+    const qStr = updateTableByID("users", req.body.id, colVals);
+    const q:QueryResult = await client.query(qStr, colVals);
+    res.sendStatus(200);
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(500);
+  }
+
 })
 
 app.listen(port, () => {
