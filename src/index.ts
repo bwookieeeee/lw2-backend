@@ -149,8 +149,10 @@ app.patch("/user", authenticateToken, async (req, res) => {
   console.log(req.body)
   try {
 
-    const colVals = Object.keys(req.body).map( key => {
-      return req.body[key];
+
+    const colVals:string[] = [];
+    Object.keys(req.body).forEach( key => {
+      if (key != 'id') colVals.push(req.body[key] as unknown as string);
     })
     console.log(colVals)
     const qStr = updateTableByID("users", req.body);
