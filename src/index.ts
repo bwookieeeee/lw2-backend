@@ -18,7 +18,7 @@ const client = new Pool({
 
 app.use(express.json());
 
-const updateTableByID = (table: string, id:string, cols: object) => {
+const updateTableByID = (table: string, cols) => {
   const str = [`UPDATE ${table}`];
   str.push('SET')
 
@@ -29,7 +29,7 @@ const updateTableByID = (table: string, id:string, cols: object) => {
     }
   })
   str.push(set.join(', '));
-  str.push(`where id='${id}'`)
+  str.push(`where id='${cols.id}'`)
   console.log(str.join(' '));
   return str.join(' ') as string;
 }
@@ -151,7 +151,7 @@ app.patch("/user", authenticateToken, async (req, res) => {
       return req.body[key];
     })
     console.log(colVals)
-    const qStr = updateTableByID("users", req.body.id, colVals);
+    const qStr = updateTableByID("users", req.body);
     const q:QueryResult = await client.query(qStr, colVals);
     res.sendStatus(200);
   } catch (e) {
