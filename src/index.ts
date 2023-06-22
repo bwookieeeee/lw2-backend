@@ -28,8 +28,9 @@ const updateTableByID = (table: string, id:string, cols: object) => {
       set.push(`${key} = ($${i + 1})`)
     }
   })
-  console.log(str);
+  str.push(set.join(', '));
   str.push(`where id='${id}'`)
+  console.log(str);
   return str;
 }
 
