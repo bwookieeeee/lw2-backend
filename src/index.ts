@@ -25,6 +25,7 @@ const updateTableByID = (table: string, id:string, cols: object) => {
       str += `${key} = '${i+1}'`
     }
   })
+  console.log(str);
   str += `where id='${id}'`
   return str;
 }
