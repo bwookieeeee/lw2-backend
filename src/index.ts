@@ -31,7 +31,7 @@ const updateTableByID = (table: string, id:string, cols: object) => {
   str.push(set.join(', '));
   str.push(`where id='${id}'`)
   console.log(str);
-  return str;
+  return str as unknown as string;
 }
 
 app.get('/', (req, res) => {
