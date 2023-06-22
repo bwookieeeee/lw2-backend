@@ -21,7 +21,9 @@ app.use(express.json());
 const updateTableByID = (table: string, id:string, cols: object) => {
   let str = `UPDATE ${table} SET `;
   Object.keys(cols).forEach( (key, i) => {
-    str += `${key} = '${i+1}'`
+    if (key != 'id') {
+      str += `${key} = '${i+1}'`
+    }
   })
   str += `where id='${id}'`
   return str;
@@ -141,7 +143,7 @@ app.patch("/user", authenticateToken, async (req, res) => {
   try {
 
     const colVals = Object.keys(req.body).map( key => {
-      if (key != 'id') return req.body[key];
+      return req.body[key];
     })
     const qStr = updateTableByID("users", req.body.id, colVals);
     const q:QueryResult = await client.query(qStr, colVals);
