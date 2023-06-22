@@ -144,12 +144,13 @@ app.post("/user", async (req, res) => {
 
 app.patch("/user", authenticateToken, async (req, res) => {
   console.log("PATCH /user", req.body.id)
-
+  console.log(req.body)
   try {
 
     const colVals = Object.keys(req.body).map( key => {
       return req.body[key];
     })
+    console.log(colVals)
     const qStr = updateTableByID("users", req.body.id, colVals);
     const q:QueryResult = await client.query(qStr, colVals);
     res.sendStatus(200);
