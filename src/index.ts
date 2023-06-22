@@ -23,9 +23,11 @@ const updateTableByID = (table: string, cols) => {
   str.push('SET')
 
   const set:string[] = []
-  Object.keys(cols).forEach( (key, i) => {
+  let i = 1;
+  Object.keys(cols).forEach( (key) => {
     if (key != 'id') {
-      set.push(`${key} = ($${i + 1})`)
+      set.push(`${key} = ($${i})`)
+      i++;
     }
   })
   str.push(set.join(', '));
