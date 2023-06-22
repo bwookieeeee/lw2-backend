@@ -1,5 +1,5 @@
 import "dotenv";
-import express, { Application, application } from "express";
+import express, { Application } from "express";
 import { Pool, QueryResult } from "pg";
 import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
@@ -19,14 +19,17 @@ const client = new Pool({
 app.use(express.json());
 
 const updateTableByID = (table: string, id:string, cols: object) => {
-  let str = `UPDATE ${table} SET `;
+  const str = [`UPDATE ${table}`];
+  str.push('SET')
+
+  const set:string[] = []
   Object.keys(cols).forEach( (key, i) => {
     if (key != 'id') {
-      str += `${key} = '${i+1}'`
+      set.push(`${key} = ($${i + 1})`)
     }
   })
   console.log(str);
-  str += `where id='${id}'`
+  str.push(`where id='${id}'`)
   return str;
 }
 
