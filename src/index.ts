@@ -118,6 +118,7 @@ app.get("/user", authenticateToken, async (req, res) => {
 })
 
 app.get("/users", authenticateToken, async (req, res) => {
+  console.log("GET /users", req.body)
   const target:string|string[] = JSON.parse(req.body).target;
 
   let qString = "SELECT * FROM users";
