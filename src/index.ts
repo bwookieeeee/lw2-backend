@@ -117,6 +117,19 @@ app.get("/user", authenticateToken, async (req, res) => {
   }
 })
 
+app.get("/users", authenticateToken, async (req, res) => {
+  const target:string|string[] = JSON.parse(req.body).target;
+
+  let qString = "SELECT * FROM users";
+
+  if (target !== "all") {
+    qString += " WHERE email IN ANY($1)"
+  }
+
+  const q = await client.query(qString, [target]);
+  res.status(200).json(q.rows);
+})
+
 app.post("/user", async (req, res) => {
   console.log(`POST /user ${req.body.email}`);
   const id: string = v4();
