@@ -122,12 +122,15 @@ app.get("/users", authenticateToken, async (req, res) => {
   const target:string|string[] = req.body.target;
 
   let qString = "SELECT * FROM users";
+  let q;
 
   if (target !== "all") {
     qString += " WHERE email IN ANY($1)"
+    q = await client.query(qString, [target]);
+  } else {
+    q = await client.query(qString);
   }
 
-  const q = await client.query(qString, [target]);
   res.status(200).json(q.rows);
 })
 
