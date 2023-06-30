@@ -5,6 +5,10 @@ import { v4 } from "uuid";
 import jwt from "jsonwebtoken";
 
 
+type colsObj = {
+  id: string
+}
+
 // Set defaults
 const port: number = process.env.EX_PORT as unknown as number || 3000;
 const databaseUrl: string = process.env.DATABASE_URL as string || "postgresql://localhost";
@@ -18,13 +22,32 @@ const client = new Pool({
 
 app.use(express.json());
 
-const updateTableByID = (table: string, cols) => {
+/**
+ * create a query string to update a table using key:value pairs to create an 
+ * SQL-safe query. If the key is `id` then it will not be added to the query. 
+ * @param table - the name of the table to update
+ * @param cols - name and value of columns
+ * @returns {string} `UPDATE `
+ * @example 
+ * make an array of column values and use `createUpdateTableQueryString` to 
+ * create a query string to update table `users` 
+ * ```ts
+ * const colVals: string[] = [];
+ *  Object.keys(req.body).forEach(key => {
+ *    if (key != 'id') colVals.push(req.body[key] as unknown as string);
+ *  })
+ *  console.log(colVals)
+ *  const qStr = updateTableByID("users", req.body);
+ *  const q: QueryResult = await client.query(qStr, colVals);
+ *  ```
+ */
+const createUpdateTableQueryString = (table: string, cols: colsObj): string => {
   const str = [`UPDATE ${table}`];
   str.push('SET')
 
-  const set:string[] = []
+  const set: string[] = []
   let i = 1;
-  Object.keys(cols).forEach( (key) => {
+  Object.keys(cols).forEach((key) => {
     if (key != 'id') {
       set.push(`${key} = ($${i})`)
       i++;
@@ -50,7 +73,7 @@ const authenticateToken = (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
     console.error(err);
     if (err) return res.sendStatus(403);
-    req.user=user;
+    req.user = user;
     next();
   })
 }
@@ -119,7 +142,7 @@ app.get("/user", authenticateToken, async (req, res) => {
 
 app.get("/users", authenticateToken, async (req, res) => {
   console.log("GET /users", req.body)
-  const target:string|string[] = req.body.target;
+  const target: string | string[] = req.body.target;
 
   let qString = "SELECT * FROM users";
   let q;
@@ -167,13 +190,13 @@ app.patch("/user", authenticateToken, async (req, res) => {
   try {
 
 
-    const colVals:string[] = [];
-    Object.keys(req.body).forEach( key => {
+    const colVals: string[] = [];
+    Object.keys(req.body).forEach(key => {
       if (key != 'id') colVals.push(req.body[key] as unknown as string);
     })
     console.log(colVals)
-    const qStr = updateTableByID("users", req.body);
-    const q:QueryResult = await client.query(qStr, colVals);
+    const qStr = createUpdateTableQueryString("users", req.body);
+    const q: QueryResult = await client.query(qStr, colVals);
     res.sendStatus(200);
   } catch (e) {
     console.error(e);
